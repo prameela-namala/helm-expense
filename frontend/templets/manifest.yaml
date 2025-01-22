@@ -1,0 +1,70 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: expense
+  labels: # these are replicaset lables
+    app: frontend
+    tier: web
+    project: expense
+spec:
+  # modify replicas according to your case
+  replicas: 2
+  selector:
+  # these are used to select the pod to create replicas
+    matchLabels:
+      app: frontend
+      tier: web
+      project: expense
+  # this is pod definition
+  template:
+    metadata:
+    # these lables belongs to pod
+      labels:
+        tier: web
+        app: frontend
+        project: expense
+    spec:
+      containers:
+      - name: frontend
+        image: joindevops/frontend:{{ .Values.deploymenent.imageVersion}}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          # limits is greater than or equal to requests
+          limits:
+            cpu: 100m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: expense
+spec:
+  type: LoadBalancer
+  selector:
+    tier: web
+    app: frontend
+    project: expense
+  ports:
+    - name: frontendend-port
+      protocol: TCP
+      port: 80
+      targetPort: 80 
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: frontend
+  namespace: expense
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: frontend
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: {{ .Values.hpa.cpuUtilization }}# usually 75 in real environment
