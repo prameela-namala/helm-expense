@@ -75,4 +75,4 @@ spec:
     name: backend
   minReplicas: 1
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 15 # Indentation corrected
+  targetCPUUtilizationPercentage: {{ .Values.hpa.cpuUtilization }}# Indentation corrected
