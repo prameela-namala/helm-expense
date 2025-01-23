@@ -1,4 +1,4 @@
 apiVersion: v1
-name: backend
+name: frontend
 version: 0.0.1
-description: for backend application
+description: for frontend application
